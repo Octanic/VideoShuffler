@@ -16,11 +16,11 @@ So I invented this little tool to help me shuffle everything and play some rando
 - Then you execute, and it will:
   - launch the application, 
   - use the files it randomly selected among all files found as command line arguments
-  - 
+  
 ![image](https://user-images.githubusercontent.com/4689962/153950324-d9064966-26b0-465c-8858-7626299dc7a4.png)
 
 If you launch this application with a command line argument, it will change the execution context. For example:
-- Today I want to run Cartoon A.
+- Today I want to watch Cartoon A.
   - So I make a shortcut for VideoShuffler with no command line argument
   - It will create a default context in Windows Registry
 - Sometimes, I want to watch another show, and none of Cartoon A
