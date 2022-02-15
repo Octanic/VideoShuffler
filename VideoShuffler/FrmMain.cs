@@ -17,11 +17,14 @@ namespace VideoShuffler
     public partial class FrmMain : Form
     {
         private readonly string _context;
+        private readonly bool _isAutoMode;
+
         public FilePairInformation[] Pathes { get; set; }
-        public FrmMain(string context)
+        public FrmMain(string context, bool isAutoMode)
         {
             InitializeComponent();
             _context = context;
+            _isAutoMode = isAutoMode;
         }
 
         private void cmdFindFolder_Click(object sender, EventArgs e)
@@ -155,6 +158,11 @@ namespace VideoShuffler
                 numFileQty.Value = data.Entry.QtdArquivos;
 
                 reloadFileList();
+            }
+
+            if (_isAutoMode)
+            {
+                cmdRun_Click(this, EventArgs.Empty);
             }
         }
 

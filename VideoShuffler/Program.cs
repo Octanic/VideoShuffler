@@ -15,16 +15,28 @@ namespace VideoShuffler
         static void Main(string[] args)
         {
             string context = System.Environment.MachineName;
+            bool autoMode = false;
 
             //TODO: Support args - multiple environment contexts
             if (args.Length > 0)
             {
-                context = args[0];
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] == "-auto")
+                    {
+                        autoMode = true;
+                    }
+                    else
+                    {
+                        context = args[i];
+
+                    }
+                }
             }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrmMain(context));
+            Application.Run(new FrmMain(context, autoMode));
         }
     }
 }
