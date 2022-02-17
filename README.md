@@ -31,7 +31,7 @@ If you launch this application with a command line argument, it will change the 
 
 
 # Ideas
-- Perhaps make room to launch another command (like `shutdown -s -f -t 3600`)
+- Perhaps make room to launch another command (like `shutdown -s -f -t 3600`) _also known as force shutdown after an hour_
 - ~~Make it autonomous (see there is already enough data to load and execute, just do it with a command line arg)~~ **NEW**: now we have the `-auto` parameter 
 - Watch multiple folders (imagine if I'm in the mood to watch another cartoon, and I don't really bother having it on my execution list?)
   - Today we can have different profiles using a command line argument, which is the context for execution
