@@ -9,6 +9,7 @@ So I invented this little tool to help me shuffle everything and play some rando
 
 # How does it work?
 - It uses Windows registry to record data ~~(pretty overkill, but since it is using local user, there's no need for admin rights)~~.
+  - **NEW** not anymore.. I mean, I decoupled it in case I decide to implement another read/write model.
 - You set the files' location (it's just one atm), and it will recursively grab every file path.
 - You can filter those files by simply using the same thing you'd use in Windows to look for files.
   - You can use the exclamation mark to invert this. For example, `!*.mp4` would remove every mp4 file from the search.
@@ -32,7 +33,7 @@ If you launch this application with a command line argument, it will change the 
 
 # Ideas
 - Perhaps make room to launch another command (like `shutdown -s -f -t 3600`) _also known as force shutdown after an hour_
-- ~~Make it autonomous (see there is already enough data to load and execute, just do it with a command line arg)~~ **NEW**: now we have the `-auto` parameter 
+- ~~Make it autonomous (see there is already enough data to load and execute, just do it with a command line arg)~~ we have the `-auto` parameter that performs this.
 - Watch multiple folders (imagine if I'm in the mood to watch another cartoon, and I don't really bother having it on my execution list?)
   - Today we can have different profiles using a command line argument, which is the context for execution
 - Test it more - I made this, because I couldn't believe I was so lazy to do it already 😂
