@@ -134,8 +134,7 @@ namespace VideoShuffler
                 {
                     errors.AppendLine("Não existem arquivos para exibir");
                 }
-
-                if (numFileQty.Value > Pathes.Length)
+                else if (numFileQty.Value > Pathes.Length)
                 {
                     errors.AppendLine($"Quantidade de arquivos disponíveis a exibir ({numFileQty.Value}) é superior à quantidade da lista ({Pathes.Length}).");
                 }
