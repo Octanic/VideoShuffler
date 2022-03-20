@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using VideoShuffler.EntryHandler;
 
 namespace VideoShuffler.Registry
 {
-    public class RegistryHandler
+    /// <summary>
+    /// Class that will handle Registry
+    /// </summary>
+    public class RegistryHandler:IEntryHandler
     {
+
         private const string KEY_PASTA_ORIGEM = "PastaOrigem";
         private const string KEY_APLICATIVO_READER = "AplicativoReader";
         private const string KEY_FILTRO = "Filtro";

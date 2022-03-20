@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using VideoShuffler.EntryHandler;
 using VideoShuffler.FileHandling;
 using VideoShuffler.Registry;
+using static VideoShuffler.EntryHandler.EntryHandlerFactory;
 
 namespace VideoShuffler
 {
@@ -18,13 +16,15 @@ namespace VideoShuffler
     {
         private readonly string _context;
         private readonly bool _isAutoMode;
+        private readonly EntryHandlerType _entryHandlerType;
 
         public FilePairInformation[] Pathes { get; set; }
-        public FrmMain(string context, bool isAutoMode)
+        public FrmMain(string context, bool isAutoMode, EntryHandlerType entryHandlerType)
         {
             InitializeComponent();
             _context = context;
             _isAutoMode = isAutoMode;
+            _entryHandlerType = entryHandlerType;
         }
 
         private void cmdFindFolder_Click(object sender, EventArgs e)
@@ -47,7 +47,7 @@ namespace VideoShuffler
         {
             if (!checkRequiredData()) return;
 
-            RegistryHandler registry = new RegistryHandler(_context);
+            IEntryHandler registry = EntryHandlerFactory.GenerateHandler(_entryHandlerType, _context);
             var resp = registry.Write(new Entry()
             {
                 AplicativoReader = txtApp.Text,

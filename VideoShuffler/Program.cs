@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace VideoShuffler
@@ -17,7 +14,6 @@ namespace VideoShuffler
             string context = System.Environment.MachineName;
             bool autoMode = false;
 
-            //TODO: Support args - multiple environment contexts
             if (args.Length > 0)
             {
                 for (int i = 0; i < args.Length; i++)
@@ -36,7 +32,10 @@ namespace VideoShuffler
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrmMain(context, autoMode));
+            
+            const EntryHandler.EntryHandlerFactory.EntryHandlerType entryHandlerType = EntryHandler.EntryHandlerFactory.EntryHandlerType.Registry;
+
+            Application.Run(new FrmMain(context, autoMode, entryHandlerType));
         }
     }
 }

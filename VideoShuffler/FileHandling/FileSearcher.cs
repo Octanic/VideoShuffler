@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace VideoShuffler.FileHandling
 {
+
+    /// <summary>
+    /// Class for searching files
+    /// </summary>
     public static class FileSearcher
     {
-        public static FilePairInformation[] FindFiles(string directory, string filters, SearchOption searchOption)
+        /// <summary>
+        /// Search files in a directory using filters
+        /// </summary>
+        /// <param name="directory">Directory to look up</param>
+        /// <param name="filterText">filter to perform the search</param>
+        /// <param name="searchOption">Options to use in case you wish to perform a recursive search, or just on the top directory</param>
+        /// <remarks><code>filterText can be either exclusive or inclusive and accept multiple filters. 
+        /// Just use <code>!</code> to perform a NOT operation</code> and use comma to separate search arguments.</remarks>
+        /// <returns>An array of <code>FilePairInformation</code> containing the files found.</returns>
+        public static FilePairInformation[] FindFiles(string directory, string filterText, SearchOption searchOption)
         {
             if (!Directory.Exists(directory)) return new FilePairInformation[] { };
+            IEnumerable<string> include, exclude, rxfilters;
 
-            var include = (from filter in filters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries) 
-                           where !string.IsNullOrEmpty(filter.Trim()) 
-                           select filter.Trim());
-
-            var exclude = (from filter in include 
-                           where filter.Contains(@"!") 
-                           select filter);
-
-            include = include.Except(exclude);
-
-            if (include.Count() == 0) include = new string[] { "*" };
-
-            var rxfilters = from filter in exclude 
-                            select string.Format("^{0}$", filter.Replace("!", string.Empty).Replace(".", @"\.").Replace("*", ".*").Replace("?", "."));
+            (include, exclude, rxfilters) = buildFilter(filterText);
 
             Regex regex = new Regex(string.Join("|", rxfilters.ToArray()), RegexOptions.IgnoreCase);
 
@@ -72,39 +72,32 @@ namespace VideoShuffler.FileHandling
 
         }
 
-
-        public static FilePairInformation[] FindFilesNonThreaded(string directory, string filters, SearchOption searchOption)
+        /// <summary>
+        /// Build the filters to be used during the search.
+        /// </summary>
+        /// <param name="filters">Filter text to be interpreted.</param>
+        /// <remarks><paramref name="filters"/> can be either a windows search pattern, or use ! to negate and comma to separate multiple search filters.</remarks>
+        /// <returns>A deconstructed object with: 
+        /// - Include filters as a text (ok with file search patterns)
+        /// - Exclude filters as a text (ok for checks on code)
+        /// - A Regex filter to be applied while inspecting files
+        /// </returns>
+        private static (IEnumerable<string>, IEnumerable<string>, IEnumerable<string>) buildFilter(string filters)
         {
-            var filterArr = filters.Split(',').Where(x=>!x.Contains("!"));
-            var filterExc = filters.Split(',').Where(x => x.Contains("!"));
+            var include = (from filter in filters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                           where !string.IsNullOrEmpty(filter.Trim())
+                           select filter.Trim());
+            var exclude = (from filter in include
+                           where filter.Contains(@"!")
+                           select filter);
+            include = include.Except(exclude);
 
-            string[] retorno;
+            if (include.Count() == 0) include = new string[] { "*" };
 
-            if (!filterArr.Any()) filterArr = new string[] { "*" };
-
-            var rxfilters = from filter in filterExc
+            var rxfilters = from filter in exclude
                             select string.Format("^{0}$", filter.Replace("!", string.Empty).Replace(".", @"\.").Replace("*", ".*").Replace("?", "."));
 
-            Regex regex = new Regex(string.Join("|", rxfilters.ToArray()), RegexOptions.IgnoreCase);
-
-            var arquivos = (from fi in filterArr
-                           select Directory.EnumerateFiles(directory, fi, searchOption)).SelectMany(x=>x);
-
-            if (filterExc.Any())
-            {
-                retorno = (from a in arquivos
-                           where !regex.IsMatch(a)
-                           select a).ToArray();
-            }
-            else
-            {
-                retorno = arquivos.ToArray();
-            }
-
-            return retorno.Select(x => new FilePairInformation(x)).ToArray();
-
+            return (include, exclude, rxfilters);
         }
-
-
     }
 }
