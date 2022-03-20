@@ -27,9 +27,12 @@ If you launch this application with a command line argument, it will change the 
   - So I make another shortcut to VideoShuffler with a command line argument: `the other show` - for example
   - It will create another place in registry that will point to this other configuration, so you don't have to change, just use another shortcut.
 
+- If you launch the application with the `-auto` command line parameter, it will use the current configuration and will auto-execute everything for you. This is useful if you already have the perfect preset.
+
+
 # Ideas
-- Perhaps make room to launch another command (like `shutdown -s -f -t 3600`)
-- Make it autonomous (see there is already enough data to load and execute, just do it with a command line arg)
-- Watch multiple folders (imagine if I'm in the mood to watch another cartoon?)
+- Perhaps make room to launch another command (like `shutdown -s -f -t 3600`) _also known as force shutdown after an hour_
+- ~~Make it autonomous (see there is already enough data to load and execute, just do it with a command line arg)~~ **NEW**: now we have the `-auto` parameter 
+- Watch multiple folders (imagine if I'm in the mood to watch another cartoon, and I don't really bother having it on my execution list?)
   - Today we can have different profiles using a command line argument, which is the context for execution
 - Test it more - I made this, because I couldn't believe I was so lazy to do it already 😂
