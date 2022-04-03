@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VideoShuffler.EntryHandler;
 
 namespace VideoShuffler.Registry
@@ -6,7 +7,7 @@ namespace VideoShuffler.Registry
     /// <summary>
     /// Class that will handle Registry
     /// </summary>
-    public class RegistryHandler:IEntryHandler
+    public class RegistryHandler : IEntryHandler
     {
 
         private const string KEY_PASTA_ORIGEM = "PastaOrigem";
@@ -15,13 +16,15 @@ namespace VideoShuffler.Registry
         private const string KEY_QTD_ARQUIVOS = "QtdArquivos";
 
         private readonly string _context;
-        private string lastError;
         public string RegistryPath { get; private set; }
 
-        public RegistryHandler(string context)
+        private readonly IRegistryManager _registryManager;
+
+        public RegistryHandler(string context, IRegistryManager registryManager)
         {
             _context = context;
             RegistryPath = $"SOFTWARE\\VideoShuffler\\{_context}";
+            _registryManager = registryManager;
         }
 
 
@@ -29,78 +32,53 @@ namespace VideoShuffler.Registry
         {
             var r = new KeyWrapper<Entry>();
 
-            var key = forceGetKey(RegistryPath);
+            var k = _registryManager.ReadKey(RegistryPath, true);
 
-            if (key == null)
+            if (k == null)
             {
-                r.Error = lastError;
+                r.Error = $"Não foi possível abrir a chave {RegistryPath}";
                 r.IsValid = false;
             }
             else
             {
+
                 r.Entry = new Entry()
                 {
-                    PastaOrigem = Convert.ToString(key.GetValue(KEY_PASTA_ORIGEM)),
-                    AplicativoReader = Convert.ToString(key.GetValue(KEY_APLICATIVO_READER)),
-                    Filtro = Convert.ToString(key.GetValue(KEY_FILTRO)),
-                    QtdArquivos = Convert.ToInt32(key.GetValue(KEY_QTD_ARQUIVOS) ?? 0)
+                    PastaOrigem = Convert.ToString(k[KEY_PASTA_ORIGEM]),
+                    AplicativoReader = Convert.ToString(k[KEY_APLICATIVO_READER]),
+                    Filtro = Convert.ToString(k[KEY_FILTRO]),
+                    QtdArquivos = Convert.ToInt32(k[KEY_QTD_ARQUIVOS])
                 };
                 r.IsValid = true;
+
             }
 
-            key.Close();
-            lastError = string.Empty;
             return r;
-        }
-
-        private Microsoft.Win32.RegistryKey forceGetKey(string key)
-        {
-            Microsoft.Win32.RegistryKey registryKey = null;
-            try
-            {
-                registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(key, true);
-            }
-            catch (Exception x)
-            {
-                lastError = $"Falha de leitura do registro: {x.Message}";
-            }
-
-            if (registryKey == null)
-            {
-                try
-                {
-                    registryKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(key);
-
-                }
-                catch (Exception x)
-                {
-                    lastError = $"Falha ao escrever registro: {x.Message}";
-                }
-            }
-
-            return registryKey;
-
         }
 
         public KeyWrapper<bool> Write(Entry entry)
         {
-            var k = forceGetKey(RegistryPath);
+            var values = new Dictionary<string, Tuple<string, Microsoft.Win32.RegistryValueKind>>
+            {
+                { KEY_FILTRO, new Tuple<string, Microsoft.Win32.RegistryValueKind>(entry.Filtro, Microsoft.Win32.RegistryValueKind.String) },
+                { KEY_QTD_ARQUIVOS, new Tuple<string, Microsoft.Win32.RegistryValueKind>(Convert.ToString(entry.QtdArquivos), Microsoft.Win32.RegistryValueKind.DWord) },
+                { KEY_APLICATIVO_READER, new Tuple<string, Microsoft.Win32.RegistryValueKind>(entry.AplicativoReader, Microsoft.Win32.RegistryValueKind.String) },
+                { KEY_PASTA_ORIGEM, new Tuple<string, Microsoft.Win32.RegistryValueKind>(entry.PastaOrigem, Microsoft.Win32.RegistryValueKind.String) }
+            };
 
-            if (k == null)
+            try
+            {
+                _registryManager.WriteKey(RegistryPath, true, values);
+            }
+            catch(Exception x)
             {
                 return new KeyWrapper<bool>()
                 {
                     IsValid = false,
-                    Error = lastError
+                    Error = x.Message
                 };
+
             }
-
-            k.SetValue(KEY_FILTRO, entry.Filtro, Microsoft.Win32.RegistryValueKind.String);
-            k.SetValue(KEY_QTD_ARQUIVOS, entry.QtdArquivos, Microsoft.Win32.RegistryValueKind.DWord);
-            k.SetValue(KEY_APLICATIVO_READER, entry.AplicativoReader, Microsoft.Win32.RegistryValueKind.String);
-            k.SetValue(KEY_PASTA_ORIGEM, entry.PastaOrigem, Microsoft.Win32.RegistryValueKind.String);
-
-            k.Close();
 
             return new KeyWrapper<bool>()
             {

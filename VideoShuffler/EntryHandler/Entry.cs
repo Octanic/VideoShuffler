@@ -1,4 +1,7 @@
-﻿namespace VideoShuffler.EntryHandler
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("VideoShuffler.Tests")]
+namespace VideoShuffler.EntryHandler
 {
     /// <summary>
     /// Represents one registry entry to be read

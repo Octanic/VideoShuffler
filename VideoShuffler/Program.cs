@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using VideoShuffler.Registry;
 
 namespace VideoShuffler
 {
@@ -35,7 +36,9 @@ namespace VideoShuffler
             
             const EntryHandler.EntryHandlerFactory.EntryHandlerType entryHandlerType = EntryHandler.EntryHandlerFactory.EntryHandlerType.Registry;
 
-            Application.Run(new FrmMain(context, autoMode, entryHandlerType));
+            WindowsRegistryManager registryManager = new WindowsRegistryManager();
+
+            Application.Run(new FrmMain(context, autoMode, entryHandlerType, registryManager));
         }
     }
 }

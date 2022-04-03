@@ -17,14 +17,16 @@ namespace VideoShuffler
         private readonly string _context;
         private readonly bool _isAutoMode;
         private readonly EntryHandlerType _entryHandlerType;
+        private readonly IRegistryManager _registryManager;
 
         public FilePairInformation[] Pathes { get; set; }
-        public FrmMain(string context, bool isAutoMode, EntryHandlerType entryHandlerType)
+        public FrmMain(string context, bool isAutoMode, EntryHandlerType entryHandlerType, IRegistryManager regMan)
         {
             InitializeComponent();
             _context = context;
             _isAutoMode = isAutoMode;
             _entryHandlerType = entryHandlerType;
+            _registryManager = regMan;
         }
 
         private void cmdFindFolder_Click(object sender, EventArgs e)
@@ -46,16 +48,7 @@ namespace VideoShuffler
         private void cmdRefresh_Click(object sender, EventArgs e)
         {
             if (!checkRequiredData()) return;
-
-            IEntryHandler registry = EntryHandlerFactory.GenerateHandler(_entryHandlerType, _context);
-            var resp = registry.Write(new Entry()
-            {
-                AplicativoReader = txtApp.Text,
-                Filtro = txtFilter.Text,
-                PastaOrigem = txtFolder.Text,
-                QtdArquivos = Convert.ToInt32(numFileQty.Value)
-            });
-
+            KeyWrapper<bool> resp = writeRegistryData();
 
             if (!resp.IsValid)
             {
@@ -69,6 +62,19 @@ namespace VideoShuffler
                 reloadFileList();
             }
 
+        }
+
+        private KeyWrapper<bool> writeRegistryData()
+        {
+            IEntryHandler registry = EntryHandlerFactory.GenerateHandler(_entryHandlerType, _context, _registryManager);
+            var resp = registry.Write(new Entry()
+            {
+                AplicativoReader = txtApp.Text,
+                Filtro = txtFilter.Text,
+                PastaOrigem = txtFolder.Text,
+                QtdArquivos = Convert.ToInt32(numFileQty.Value)
+            });
+            return resp;
         }
 
         private bool checkRequiredData(bool fullCheck = false)
@@ -146,7 +152,17 @@ namespace VideoShuffler
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
-            RegistryHandler rh = new RegistryHandler(_context);
+            loadRegistryData();
+
+            if (_isAutoMode)
+            {
+                cmdRun_Click(this, EventArgs.Empty);
+            }
+        }
+
+        private void loadRegistryData()
+        {
+            RegistryHandler rh = new RegistryHandler(_context, _registryManager);
             var data = rh.Read();
 
             if (data.IsValid)
@@ -157,11 +173,6 @@ namespace VideoShuffler
                 numFileQty.Value = data.Entry.QtdArquivos;
 
                 reloadFileList();
-            }
-
-            if (_isAutoMode)
-            {
-                cmdRun_Click(this, EventArgs.Empty);
             }
         }
 
